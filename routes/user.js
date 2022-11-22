@@ -41,72 +41,45 @@ let upload = multer({
     }
 }).single('fileUpload');
 
-// test single or multiple file 
+// file upload function start -- end
 
-// const UPLOADS_FOLDER = './upload';
-
-// const storage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-//         cb(null, UPLOADS_FOLDER);
-//     },
-//     filename: (req, file, cb) => {
-//         const fileExt = path.extname(file.originalname);
-//         const fileName = file.originalname
-//             .replace(fileExt, '')
-//             .toLocaleLowerCase()
-//             .split(' ')
-//             .join('-') + '-' + Date.now();
-//         cb(null, fileName + fileExt);
-//     }
-// })
-
-
-// const upload = multer({
-//     storage: storage,
-//     limits: {
-//         fileSize: 1000000 // 1 mb
-//     },
-//     fileFilter: (req, file, cb) => {
-//         if (
-//             file.mimetype == 'image/png' ||
-//             file.mimetype == 'image/jpg' ||
-//             file.mimetype == 'image/jpeg'
-//         ) {
-//             cb(null, true);
-//         } else {
-//             cb(new Error('file only support jpg, png or jpeg'));
-//         }
-//     }
-// });
-
-// router.post('/uploadFile', isLoggedIn, upload.single('fileUpload'), async (req, res) => {
-//     console.log(req.file)
-// })
-
-
-// file upload funtion end
-
-
-
-// router.post('/uploadFile', isLoggedIn, async (req, res, next) => {
-//     try {
-//   upload(req, res, (err) => {
-//     const filePath = req.file.path
-//     if (err) {
-//         console.log(err)
-//     } else {
-//         res.status(200).json({ status: true, message: 'file successfully uploaded', filePath });
-//     };
-// });
-//     } catch (err) {
-//         console.log(err)
-//     }
-//  })
-
+// upload route
+router.post('/uploadFile', (req, res) => {
+    upload(req, res, (err) => {
+        if (err) {
+             res.send(err)
+        } else {
+            res.status(200).json({
+                message: 'file Upload successfully',
+                path: req.file.path,
+                filename: req.file.filename
+            });
+         };
+     })
+ })
 
 //upload route end
 
+// view image route --start 
 
+
+router.get('/viewImage', (req, res) => {
+    var options = {
+        root: path.join(__dirname)
+    };
+    let filename = 'upload/fileUpload-1669108104946.jpg'
+    res.sendFile(filename, options, function (err) {
+        if (err) {
+           console.log(err)
+        } else {
+            console.log('send FIle', filename);
+        };
+    })
+});
+
+
+
+// view image route -- end
 
 // Create Projects
 router.post('/projects', isLoggedIn, async (req, res, next) => {
@@ -380,7 +353,7 @@ router.get('/columns', isLoggedIn, async (req, res, next) => {
             res.status(400).json({ status: false, message: "Please speficify a column_id." });
         }
     } catch (err) {
-        res.status(500).json({ status: false, message: err }); // If any error occurs
+        res.status(500).json({ status: false, messacolumn_idge: err }); // If any error occurs
     }
 });
 
@@ -388,21 +361,6 @@ router.get('/columns', isLoggedIn, async (req, res, next) => {
 router.post('/tasks', isLoggedIn, async (req, res, next) => {
 
     try {
-
-        upload(req, res, (err) => {
-           const filePath = req.files
-            console.log(filePath);
-            if (err) {
-                console.log( 'upload error', err)
-            } else {
-                res.status(200).json({ status: true, message: 'file successfully uploaded', filePath });
-            console.log('succes')
-            };
-        });
-        // const { formData } = req.body
-        // console.log('back end', formData);
-
-
         if (req.body.column_id && mongoose.Types.ObjectId.isValid(req.body.column_id)) {
             let task = new Task(req.body);
             await task.joiValidate(req.body);

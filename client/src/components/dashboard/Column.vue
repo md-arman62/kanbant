@@ -100,7 +100,7 @@
           
           <!-- file upload input form -- start -->
               <input type="file" name="fileUpload" v-on:change="onFileSelected" >
-              <!-- <input type="submit" value="Submit" @click="uploadFileSubmitted"> -->
+              <input type="submit" value="Submit" @click="uploadFileSubmitted">
           <!-- file upload input form end -->
 
           <!-- file uploaded message show -- start -->
@@ -188,6 +188,7 @@ export default {
       // file uploaded message store and show -- start
       filePath: '',
       uploadMsg: '',
+      filename: '',
       isFileuploaded: false,
       // file uploaded message store and show -- end
 
@@ -273,30 +274,32 @@ export default {
     },
 
     // send request back end for store data in local mechine -- start.
-    // uploadFileSubmitted( /* selectedFile */ ) {
+    uploadFileSubmitted( /* selectedFile */ ) {
 
-    //   let { selectedFile } = this.new_task;
+      let { selectedFile } = this.new_task;
 
 
-    //   let formData = new FormData();
-    //   formData.append('fileUpload', selectedFile, selectedFile.name);
+      let formData = new FormData();
+      formData.append('fileUpload', selectedFile, selectedFile.name);
       // return formData
 
-    //   this.$http.post('/user/uploadFile', formData).then(res => {
-    //     if (res.data.status) {
-    //       this.isFileuploaded = true
-    //       this.uploadMsg = res.data.message
-    //       this.filePath = res.data.filePath
-    //     } 
-    //   })
-    // },
+      this.$http.post('/user/uploadFile', formData).then(res => {
+        console.log(res.data.filename)
+        if (res.status) {
+          this.isFileuploaded = true
+          this.uploadMsg = res.data.message
+          this.filePath = res.data.path
+          this.filename = res.data.filename
+        } 
+      })
+    },
 
 
     // send request back end for store data in local mechine -- end
     createNewTask() {
 
       let {
-        selectedFile,
+        // selectedFile,
         title,
         description,
         label,
@@ -306,11 +309,12 @@ export default {
         isLabeled
       } = this.new_task;
 
-      let formData = new FormData();
-      formData.append('fileUpload', selectedFile, selectedFile.name);
+      // let formData = new FormData();
+      // formData.append('fileUpload', selectedFile, selectedFile.name);
+      const filename = this.filename;
+      const filePath = this.filePath;
 
-
-      let data = { title, column_id, description, formData };
+      let data = { title, column_id, description, filename, filePath };
       if (column_id !== null) {
         if (expireAt !== null) {
           expireAt = new Date(expireAt);

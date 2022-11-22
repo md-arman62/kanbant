@@ -12,6 +12,15 @@ var config = require('./config');
 
 var app = express();
 
+// static file start
+
+app.use('/photos', express.static(__dirname + '/upload'));
+
+
+// static file end
+
+
+
 // Server Configurations
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({
