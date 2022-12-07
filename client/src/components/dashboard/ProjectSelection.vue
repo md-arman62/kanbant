@@ -35,6 +35,8 @@
         </div>
       </template>
     </multiselect>
+
+
     <span
       class="badge badge-success mr-2"
       v-if="!isEditing"
@@ -48,13 +50,20 @@
     <span class="badge badge-danger" style="font-size: 14px; cursor:pointer;">
       <i class="fas fa-trash p-1" @click="deleteProject"></i>
     </span>
+
+    <div>
+    <a class="google-sheet" href="https://docs.google.com/spreadsheets/d/1324fN4Flg4ICUY_EM51Loa90YXRjkJq5pG__sJ2BB74/edit#gid=62909436" target="_blank">GOOGLE SHEET LINK</a>  
+    </div>
+
     <i
       class="fas fa-cog text-white float-right mr-3 mt-3"
       style="font-size: 25px;"
       v-b-toggle.sidebar-1
     ></i>
+    
   </div>
 </template>
+
 
 <script>
 import Multiselect from "vue-multiselect";
@@ -161,5 +170,11 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+/* .google-sheet{
+ float: right;
+ margin-right: 150px;
+ margin-top: -20px; */
+ /* color: black; 
+} */
 </style>

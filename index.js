@@ -12,12 +12,12 @@ var config = require('./config');
 
 var app = express();
 
-// static file start
+// static file serve start
 
-app.use('/photos', express.static(__dirname + '/upload'));
+// app.use('/photos', express.static(__dirname + '/upload'));
+app.use('/multipleFiles', express.static(__dirname))
 
-
-// static file end
+// static files serve end
 
 
 

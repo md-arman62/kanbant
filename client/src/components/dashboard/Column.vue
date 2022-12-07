@@ -97,17 +97,15 @@
          </div>
           <!-- description end -->
 
-          
-          <!-- file upload input form -- start -->
-              <input type="file" name="fileUpload" v-on:change="onFileSelected" >
-              <input type="submit" value="Submit" @click="uploadFileSubmitted">
-          <!-- file upload input form end -->
+         <!-- upload multiple photos -- Start -->
+         <input type="file" name="images" multiple v-on:change="selectedFiles" >
+         <input type="submit" value="submit files" @click="multipleFileSubmited">
+         <!-- upload multiple photos -- END -->
+
+
 
           <!-- file uploaded message show -- start -->
-            <p v-show="isFileuploaded" > {{ uploadMsg }} file Path: {{ filePath }} </p>
-          <!-- file uploaded message show -- start -->
-
-         <a v-bind:href="filePath" target="_blank"> see photo </a>
+         <p v-show="isFileuploaded"> {{ uploadMsg }}</p>
 
           <b-form-group label="Do you wanna label the task?" class="text-left">
             <b-form-radio-group
@@ -140,9 +138,11 @@
               variant="success"
               style="width: 48%;"
               @click="createNewTask"
+              
             >
               <i class="fas fa-check mr-2" />Save task
             </b-button>
+          
             <b-button
               v-if="taskTitleChecker"
               class="float-right mt-3"
@@ -175,7 +175,6 @@
 </template>
 
 <script>
-
 import eventBus from "../../eventBus";
 import Task from "./Task";
 export default {
@@ -185,12 +184,15 @@ export default {
   },
   data() {
     return {
-      // file uploaded message store and show -- start
+
+      multipleFileSelect: [],
       filePath: '',
       uploadMsg: '',
-      filename: '',
+      // filename: '',
       isFileuploaded: false,
-      // file uploaded message store and show -- end
+      multipleFilePath: [],
+      multipleFileName: [],
+
 
       available_icons: [
         "todo",
@@ -214,6 +216,7 @@ export default {
         title: "",
         description: '',
         selectedFile: '',
+
         label: "",
         labelType: null,
         expireAt: null,
@@ -273,24 +276,32 @@ export default {
 
     },
 
-    // send request back end for store data in local mechine -- start.
-    uploadFileSubmitted( /* selectedFile */ ) {
+    selectedFiles(event) {
+      this.new_task.filesSelected = event.target.files;
+      console.log(event.target.files.length);
+      for (let i = 0; i < event.target.files.length; i++) {
+       this.multipleFileSelect.push(event.target.files[i]);
+      }
+    },
 
-      let { selectedFile } = this.new_task;
 
-
+    multipleFileSubmited() {
+      const files = this.multipleFileSelect
       let formData = new FormData();
-      formData.append('fileUpload', selectedFile, selectedFile.name);
-      // return formData
-
-      this.$http.post('/user/uploadFile', formData).then(res => {
-        console.log(res.data.filename)
-        if (res.status) {
+      for (let i = 0; i < files.length; i++){
+        formData.append('images', files[i], files[i].name)
+      }
+      
+      this.$http.post('/user/multipleFileUpload', formData).then(res => {
+        if (res.status === 200) {
+          this.uploadMsg = 'Your file was uploaded!'
           this.isFileuploaded = true
-          this.uploadMsg = res.data.message
-          this.filePath = res.data.path
-          this.filename = res.data.filename
-        } 
+        }
+        const result = res.data.file;
+        for (let i = 0; i < result.length; i++){
+          this.multipleFilePath.push(result[i].path)
+          this.multipleFileName.push(result[i].filename)
+        }
       })
     },
 
@@ -309,12 +320,11 @@ export default {
         isLabeled
       } = this.new_task;
 
-      // let formData = new FormData();
-      // formData.append('fileUpload', selectedFile, selectedFile.name);
-      const filename = this.filename;
-      const filePath = this.filePath;
-
-      let data = { title, column_id, description, filename, filePath };
+      let multipleFileName = this.multipleFileName
+      let multipleFilePath = this.multipleFilePath
+      
+      
+      let data = { title, column_id, description, /* filename, filePath, */  multipleFileName, multipleFilePath };
       if (column_id !== null) {
         if (expireAt !== null) {
           expireAt = new Date(expireAt);
@@ -331,8 +341,8 @@ export default {
         this.$http
           .post("/user/tasks", data)
           .then(res => {
-            console.log(res);
-            if (res.data.status === true) {
+            
+            if (res.data.status === true) {           
               this.$swal({
                 position: "bottom-end",
                 icon: "success",
@@ -372,6 +382,7 @@ export default {
         // warning...
       }
     },
+
     resetNewTask() {
       this.uploadMsg = '',
       this.new_task = {
@@ -478,3 +489,24 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+
+input[type='file']{
+  background-color: rgb(255, 81, 81);
+  border: 2px solid rgb(255, 81, 81);
+  width: 190px;
+}
+
+input[type='submit']{
+  color: white;
+  width: 110px;
+  margin: 2px;
+  background-color: green;
+ border: none;
+  padding: 5px;
+}
+
+
+
+</style>

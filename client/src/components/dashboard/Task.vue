@@ -1,45 +1,58 @@
 <template>
   <div>
-    <draggable
-      class="list-group text-left mt-4"
-      :list="tasks"
-      style="cursor:move; min-height: 100px;"
-      group="people"
-      ghost-class="ghost"
-      @change="changed(column_id, $event)"
-      :animation="200"
-    >
-      <b-card
-        class="mb-2 text-left task"
-        :class="getTaskCustomization"
-        :style="getTaskHeight(element)"
+    <draggable class="list-group text-left mt-14 container" :list="tasks" style="cursor:pointer; min-height: 100px;" group="people"
+      ghost-class="ghost" @change="changed(column_id, $event)" :animation="200">
+      <b-card class="mb-2 text-left task" :class="getTaskCustomization" :style="getTaskHeight(element)"
         v-for="(element) in tasks"
-        @contextmenu.prevent.stop="e => {element['column_id'] = column_id; taskHandle($event, element)}"
-        :key="element._id"
-      >
-        <h4 class="card-title">{{element.title}}</h4>
-        <p> {{element.description}} </p>
-        <!-- <button> <img v-bind:src="'http://127.0.0.1:3000/photos/' + element.filename" width="100px" height="100px" alt=""> {{element.filePath}} </button> -->
-        <button> <a target="_blank" v-bind:href="'http://127.0.0.1:3000/photos/' + element.filename" width="100px" height="100px" > {{element.filePath}} </a> </button>
+        @contextmenu.prevent.stop="e => { element['column_id'] = column_id; taskHandle($event, element) }"
+        :key="element._id">
+        <!-- card description start -->
+
+        <div class="title">
+          <h4 class="card-title">{{ element.title }}</h4>
+        </div>
+        <div class="description">
+          <p > {{ element.description }} </p>
+        </div>
+
+        <br>
+        <br>
+
+        <div class="list">
+          <ul >
+            <img src="../icon/icons8-attach-50.png" alt="" class="icon">
+          <li> <a v-bind:href="'http://127.0.0.1:3000/multipleFiles/' + filePath"
+              v-for="(filePath, index) in element.multipleFilePath" :key="index" target="_black" class="file-path"
+              style="background-image:url('http://127.0.0.1:3000/multipleFiles/' + filePath[0][0])"
+              > {{( index + 1 )}} . {{ filePath[0].slice(8) }} </a> 
+            </li>
+        </ul>
+        </div>
+
+        <!-- <div v-for="(filePath, index) in element.multipleFilePath" :key="index" >
+          <ul>
+            <li>
+              <a target="_blank" v-bind:href="('http://127.0.0.1:3000/multipleFiles/' + filePath)"> a </a>
+            </li>
+          </ul>
+        </div> -->
+
+        <!-- card description end -->
 
 
-        <span
-          style="position: absolute; top: 0px; cursor:pointer;"
-          @click.prevent.stop="e => {element['column_id'] = column_id; taskHandle($event, element)}"
-        >
+        <span style="position: absolute; top: 0px; cursor:pointer;"
+          @click.prevent.stop="e => { element['column_id'] = column_id; taskHandle($event, element) }">
           <i class="fas fa-ellipsis-h"></i>
         </span>
         <p v-if="element.expireAt">
           <i class="fa fa-clock" />
-          {{element.expireAt | moment('MMMM D')}}
+          {{ element.expireAt | moment('MMMM D') }}
         </p>
-        <span
-          :class="`badge badge-${element.labelType}`"
-          style="text-transform:capitalize; font-size: 0.635rem"
-          v-if="element.labelType"
-        >
+
+        <span :class="`badge badge-${element.labelType}`" style="text-transform:capitalize; font-size: 0.635rem"
+          v-if="element.labelType">
           <i class="fas fa-circle" />
-          {{element.label}}
+          {{ element.label }}
         </span>
       </b-card>
     </draggable>
@@ -53,10 +66,7 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      URL: 'http://127.0.0.1:3000/photos/fileUpload-1669108104946.jpg',
-      image: null,
-      file: null,
-      base64: null,
+
     }
   },
   props: ["tasks", "column_id", "customization"],
@@ -73,22 +83,6 @@ export default {
   },
   methods: {
 
-    viewImage() {
-      this.$http.get('/user/viewImage').then(res => {
-        console.log(res.data)
-        this.image = res.data
-        this.fileReader();
-      })
-    },
-
-    baseToImage() {
-      this.file = new FileReader();
-      this.file(this.image)
-      this.file.onload = function (evt) {
-        return this.base64 = evt.target.result
-        
-      }
-    },
 
     getTaskHeight(element) {
       if (element.date || element.label) {
@@ -100,7 +94,7 @@ export default {
     taskHandle(event, item) {
       eventBus.$emit("task-option-handled", { event, item });
     },
-    changed: function(column_id, evt) {
+    changed: function (column_id, evt) {
       if (evt.added) {
         let task_id = evt.added.element._id;
         this.$http
@@ -134,8 +128,58 @@ export default {
 </script>
 
 <style scoped >
-.file-path{
+
+/* *{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+} */
+/* .description {
   color: black;
   font: bold;
+  margin-top: 10px;
+} */
+
+/* .singleFile {
+  background-color: #fff;
+  margin-top: 30px;
+  margin-left: -21px;
+  width: 167px;
+} */
+/* .full-card{
+  background-color: green;
+  min-height: 100px;
+ } */
+
+
+.file-path {
+  display: inline-block;
+  color: rgb(255, 255, 255);
+  width: 100px;
+  /* margin-top: 10px; */
+
 }
+
+.list {
+  background-color: #7f7b7b;
+  height: 100px;
+  margin: 43px 0px 20px -21px;
+  width: 184px;
+  overflow: scroll;
+}
+
+.list > ul {
+  list-style-type: none;
+}
+
+.icon{
+    margin-top: 10px;
+    width: 100px;
+    height: 20px;
+    font: white;
+}
+/* .container{
+  background-color: red;
+} */
+
 </style>

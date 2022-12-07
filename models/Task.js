@@ -5,8 +5,16 @@ const Joi = require('joi');
 var TaskSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, require: false },
-    filename: { type: String, require: false },
-    filePath: { type: String, require: false },
+    // single file path store in database start
+    // filename: { type: String, require: false },
+    // filePath: { type: String, require: false },
+    // single file path store in database End
+
+    // multiple files path store in database Start
+    multipleFileName:[{ type: Array, require: false }],
+    multipleFilePath: [{ type: Array, requre: false }],
+    // multiple files path store in database End
+
     expireAt: { type: Date, required: false },
     label: { type: String, required: false },
     labelType: { type: String, enum: ['danger', 'warning', 'primary', 'info', 'dark', 'success'], required: false }
@@ -19,8 +27,16 @@ TaskSchema.methods.joiValidate = (obj) => {
         title: Joi.string().min(3).max(60).required(),
         column_id: Joi.string(),
         description: Joi.string(),
-        filename: Joi.string(),
-        filePath: Joi.string(),
+    // single file path store in database start
+        // filename: Joi.string(),
+        // filePath: Joi.string(),
+    // single file path store in database end
+
+    // multiple files path store in database Start
+        multipleFileName: Joi.array(),
+        multipleFilePath: Joi.array(),
+    // multiple files path store in database End
+        
         expireAt: Joi.date(),
         label: Joi.string().min(3).max(15),
         labelType: Joi.string().valid("danger", "warning", "primary", "success", "info", "dark")
